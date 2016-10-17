@@ -1,11 +1,12 @@
 ## boa.js
 
-Browser-side middleware using generators. Like [koa](https://github.com/koajs/koa), but tied to to React and the DOM instead of node.
+Boa.js is browser-side middleware handler using generators. Like [koa](https://github.com/koajs/koa), but tied to to React and the DOM instead of node.
 
-This library is an experiment to pair with a koa.js app. Its intent is to use the same routes in a middleware architecture on both the server.
-If this is a static site, you can ship the entire app the the client, where following page-loads are built there.
+This library is an experiment which couples tightly to a koa.js app. It is intened is to use the same routes in a middleware architecture on both the server. If the site is static, you can ship the entire thing app to the client, where following pages are built, without interacting with the server.
 
-On the server side, to you'll want to build static html. You'll want something like the folling in your `server.js`:
+On the server side, we'll build static html for the initial load, search engines, and js-disabled browsers.
+
+You'll want something like the folling in your `server.js`:
 
 ```
 var app = require('koa')()
@@ -20,7 +21,7 @@ middleware.forEach(app.use.bind(app))
 app.listen(process.env.PORT)
 ```
 
-The `route-build-page.js` might something like
+The `route-build-page.js` might something like:
 
 ```
 React = require('react')
@@ -28,7 +29,7 @@ React = require('react')
 var htmlRender = require('./html-render')     // builds html from a single dynamic React template
   , compose = require('koa-compose')
   , clientRoutes = require('./client-routes') // this prepares data for react template
-  // each `clientRoute` attaches `templateName` and `pageData` to the koa/boa context object
+
 
 module.exports = compose(
   [renderTemplateAndDataToHTMLBody]
@@ -38,10 +39,12 @@ module.exports = compose(
 function* renderTemplateAndDataToHTMLBody(next) {
   yield *next
   this.body = htmlRender(this.path, this.templateName, this.pageData)
+  // the the `yield *next` first, this expects each `clientRoute` function
+  // to attache `templateName` and `pageData` to the koa/boa context object
 }
 ```
 
-On the client side, you'll need to handle push and pop state history, and re-renders with a new path on clicks.
+On the client side, you'll re-render the new path to respond to clicks, push, and pop state history.
 
 It might look something like the following:
 
@@ -61,7 +64,7 @@ function onDomReady() {
 
   app.mountReactComponent(FullSite, 'html')
   renderPath()
-
+  
   window.onpopstate = onPopState
 }
 
@@ -85,3 +88,5 @@ function onClick(e){
   document.activeElement && document.activeElement.blur()
 }
 ```
+
+It is modelled to work almost identically to koa, only against the browser's api instead of node's.
