@@ -1,5 +1,7 @@
 ## boa.js
 
+![rainbow-blend-banner](https://cloud.githubusercontent.com/assets/318925/19651026/4c5146f2-99d9-11e6-87cc-777ffafe729f.jpg)
+
 Boa.js is browser-side middleware handler using generators. Like [koa](https://github.com/koajs/koa), but tied to to React and the DOM instead of node.
 
 This library is an experiment which couples tightly to a koa.js app. It is intened is to use the same routes in a middleware architecture on both the server. If the site is static, you can ship the entire thing app to the client, where following pages are built, without interacting with the server.
